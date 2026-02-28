@@ -2,6 +2,7 @@
 using dotnetDeneme.Dtos.Stock;
 using dotnetDeneme.Mappers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace dotnetDeneme.Controllers
 {
@@ -17,18 +18,19 @@ namespace dotnetDeneme.Controllers
         }
 
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
-        public IActionResult GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
+        public async Task<IActionResult> GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
-            var stocks = _context.Stocks.ToList()
-             .Select(s => s.ToStockDto());
+            var stocks = await _context.Stocks.ToListAsync();
+
+            var stockDto = stocks.Select(s => s.ToStockDto());
             return Ok(stocks);
         }
 
 
         [HttpGet("{id}")]
-        public IActionResult GetById([FromRoute] int id)
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var stocks = _context.Stocks.Find(id);
+            var stocks = await _context.Stocks.FindAsync(id);
             if (stocks is null)
             {
                 return NotFound();
@@ -39,11 +41,11 @@ namespace dotnetDeneme.Controllers
 
         [HttpPost]
 
-        public IActionResult Create([FromBody] CreateStockRequestDto stockDto)
+        public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto)
         {
             var stockModel = stockDto.ToStockFromCreateDto();
-            _context.Stocks.Add(stockModel);
-            _context.SaveChanges();
+            await _context.Stocks.AddAsync(stockModel);           // database'e giden herhangi bir şeye await eklemeliyiz.
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
         }
@@ -51,9 +53,9 @@ namespace dotnetDeneme.Controllers
         [HttpPut]
         [Route("{id}")]
 
-        public IActionResult Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
         {
-            var stockModel = _context.Stocks.FirstOrDefault(x => x.Id == id);
+            var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
 
             if (stockModel is null)
             {
@@ -67,7 +69,7 @@ namespace dotnetDeneme.Controllers
             stockModel.Industry = updateDto.Industry;
             stockModel.MarketCap = updateDto.MarketCap;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(stockModel.ToStockDto());
         }
@@ -75,23 +77,23 @@ namespace dotnetDeneme.Controllers
         [HttpDelete]
         [Route("{id}")]
 
-        public IActionResult Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var stockModel = _context.Stocks.FirstOrDefault(x => x.Id == id);
+            var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
 
             if (stockModel is null)
             {
                 return NotFound();
             }
 
-            _context.Stocks.Remove(stockModel);
+            _context.Stocks.Remove(stockModel); // Remove, asenkron bir fonksiyon değil.
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
     }
 }
-
+// Database ile ilgili her şeyi asenkron yapmalıyız.
 //EF = “C# nesneleri üzerinden DB işlemi yapma”. ORM
