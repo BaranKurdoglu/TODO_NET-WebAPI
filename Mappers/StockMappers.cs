@@ -5,6 +5,7 @@ namespace dotnetDeneme.Mappers
 {
     public static class StockMappers
     {
+        //TODO: TEST
         public static StockDto ToStockDto(this Stock stokModel)
         {
             return new StockDto
