@@ -3,10 +3,10 @@ using dotnetDeneme.Models;
 
 namespace dotnetDeneme.Mappers
 {
-    public static class StockMappers
+    public static class StockMappers   // Veri dönüşüm katmanı.
     {
 
-        public static StockDto ToStockDto(this Stock stokModel)
+        public static StockDto ToStockDto(this Stock stokModel)    //this -> Extension method 
         {
             return new StockDto
             {

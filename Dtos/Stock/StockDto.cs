@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dotnetDeneme.Dtos.Stock
 {
-    public class StockDto
-    {
+    public class StockDto    // DTO -> Data Transfer Object. Katmanlar - API arasında taşınan request/response modelidir.
+    {                        
         [Key]
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
         public string Symbol { get; set; } = string.Empty;
 
