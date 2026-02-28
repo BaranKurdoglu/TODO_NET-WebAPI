@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dotnetDeneme.Controllers
 {
-    [Route("dotnetDeneme/stock")]
+    [Route("api/stock")]
     [ApiController]
     public class StockController : ControllerBase
     {
