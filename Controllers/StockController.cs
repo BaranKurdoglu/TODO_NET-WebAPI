@@ -11,21 +11,18 @@ namespace dotnetDeneme.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;  //_context, veritabanıyla konuşmak için kullandığımız ApplicationDBContext nesnesi.
         private readonly IStockRepository _stockRepo;
 
-        public StockController(ApplicationDBContext context, IStockRepository stockRepo)
+        public StockController(IStockRepository stockRepo)
         {
             _stockRepo = stockRepo;
-            _context = context;
         }
 
 
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
         public async Task<IActionResult> GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
-            var stocks = await _stockRepo.GetAllAsync(); // Sorguyu database düzeyinde çalıştırarak bellekteki gereksiz veriyi önledik.
-                                                         //EF Core'da databaseden çekilen her şey izlenir. Eğer bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında izlemeyi kapatmak için kullanırız.
+            var stocks = await _stockRepo.GetAllAsync();
             var stockDto = stocks;
             return Ok(stocks);
         }
@@ -34,7 +31,7 @@ namespace dotnetDeneme.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var stocks = await _context.Stocks.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+            var stocks = await _stockRepo.GetByIdAsync(id);
             if (stocks is null)
             {
                 return NotFound();
@@ -48,8 +45,8 @@ namespace dotnetDeneme.Controllers
         public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto)
         {
             var stockModel = stockDto.ToStockFromCreateDto();
-            await _context.Stocks.AddAsync(stockModel);           // database'e giden herhangi bir şeye await eklemeliyiz.
-            await _context.SaveChangesAsync();
+            await _stockRepo.CreateAsync(stockModel);           // database'e giden herhangi bir şeye await eklemeliyiz.
+
 
             return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
         }
@@ -58,21 +55,12 @@ namespace dotnetDeneme.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
         {
-            var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+            var stockModel = await _stockRepo.UpdateAsync(id, updateDto);
 
             if (stockModel is null)
             {
                 return NotFound();
             }
-
-            stockModel.Symbol = updateDto.Symbol;
-            stockModel.CompanyName = updateDto.CompanyName;
-            stockModel.Purchase = updateDto.Purchase;
-            stockModel.LastDiv = updateDto.LastDiv;
-            stockModel.Industry = updateDto.Industry;
-            stockModel.MarketCap = updateDto.MarketCap;
-
-            await _context.SaveChangesAsync();
 
             return Ok(stockModel.ToStockDto());
         }
@@ -81,16 +69,14 @@ namespace dotnetDeneme.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+            var stockModel = await _stockRepo.DeleteAsync(id);
 
             if (stockModel is null)
             {
                 return NotFound();
             }
 
-            _context.Stocks.Remove(stockModel); // Remove, asenkron bir fonksiyon değil.
 
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
