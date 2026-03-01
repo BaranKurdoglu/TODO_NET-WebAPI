@@ -17,12 +17,13 @@ namespace dotnetDeneme.Controllers
             _context = context;
         }
 
+
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
         public async Task<IActionResult> GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
-            var stocks = await _context.Stocks.ToListAsync();
-
-            var stockDto = stocks.Select(s => s.ToStockDto());
+            var stocks = await _context.Stocks.AsNoTracking().Select(s => s.ToStockDto()).ToListAsync(); // Sorguyu database düzeyinde çalıştırarak bellekteki gereksiz veriyi önledik.
+                                                                                                         //EF Core'da databaseden çekilen her şey izlenir. Eğer bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında izlemeyi kapatmak için kullanırız.
+            var stockDto = stocks;
             return Ok(stocks);
         }
 
@@ -30,7 +31,7 @@ namespace dotnetDeneme.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var stocks = await _context.Stocks.FindAsync(id);
+            var stocks = await _context.Stocks.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
             if (stocks is null)
             {
                 return NotFound();
@@ -39,8 +40,8 @@ namespace dotnetDeneme.Controllers
             return Ok(stocks.ToStockDto());
         }
 
-        [HttpPost]
 
+        [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto)
         {
             var stockModel = stockDto.ToStockFromCreateDto();
@@ -50,9 +51,8 @@ namespace dotnetDeneme.Controllers
             return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
         }
 
-        [HttpPut]
-        [Route("{id}")]
 
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
         {
             var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
@@ -74,9 +74,8 @@ namespace dotnetDeneme.Controllers
             return Ok(stockModel.ToStockDto());
         }
 
-        [HttpDelete]
-        [Route("{id}")]
 
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
