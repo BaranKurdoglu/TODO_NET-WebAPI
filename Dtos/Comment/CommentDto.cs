@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace dotnetDeneme.Models
+namespace dotnetDeneme.Dtos.Comment
 {
-    public class Comment
+    public class CommentDto
     {
         public int? StockID { get; set; } //key
-        public Stock? Stock { get; set; } // Hangi Comment'ın hangi Stock'ta olduğunu görebilmek için. navigation
 
-        [Key] // primary key
+        [Key]
         public int Id { get; set; }
 
         public string Title { get; set; } = string.Empty;
@@ -15,6 +14,5 @@ namespace dotnetDeneme.Models
         public string Content { get; set; } = string.Empty;
 
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-
     }
 }
