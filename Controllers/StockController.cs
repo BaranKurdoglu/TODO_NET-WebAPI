@@ -1,5 +1,6 @@
 ﻿using dotnetDeneme.Data;
 using dotnetDeneme.Dtos.Stock;
+using dotnetDeneme.Interfaces;
 using dotnetDeneme.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,11 @@ namespace dotnetDeneme.Controllers
     public class StockController : ControllerBase
     {
         private readonly ApplicationDBContext _context;  //_context, veritabanıyla konuşmak için kullandığımız ApplicationDBContext nesnesi.
+        private readonly IStockRepository _stockRepo;
 
-        public StockController(ApplicationDBContext context)
+        public StockController(ApplicationDBContext context, IStockRepository stockRepo)
         {
+            _stockRepo = stockRepo;
             _context = context;
         }
 
@@ -21,8 +24,8 @@ namespace dotnetDeneme.Controllers
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
         public async Task<IActionResult> GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
-            var stocks = await _context.Stocks.AsNoTracking().Select(s => s.ToStockDto()).ToListAsync(); // Sorguyu database düzeyinde çalıştırarak bellekteki gereksiz veriyi önledik.
-                                                                                                         //EF Core'da databaseden çekilen her şey izlenir. Eğer bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında izlemeyi kapatmak için kullanırız.
+            var stocks = await _stockRepo.GetAllAsync(); // Sorguyu database düzeyinde çalıştırarak bellekteki gereksiz veriyi önledik.
+                                                         //EF Core'da databaseden çekilen her şey izlenir. Eğer bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında izlemeyi kapatmak için kullanırız.
             var stockDto = stocks;
             return Ok(stocks);
         }
