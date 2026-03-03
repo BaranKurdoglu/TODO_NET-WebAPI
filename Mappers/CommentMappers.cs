@@ -16,5 +16,16 @@ namespace dotnetDeneme.Mappers
                 StockID = commentModel.StockID
             };
         }
+
+
+        public static Comment ToCommentFromCreate(this CreateCommentDto commentDto, int stockId)
+        {
+            return new Comment
+            {
+                Title = commentDto.Title,
+                Content = commentDto.Content,
+                StockID = stockId
+            };
+        }
     }
 }
