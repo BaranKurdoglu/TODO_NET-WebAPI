@@ -24,5 +24,20 @@ namespace dotnetDeneme.Controllers
 
             return Ok(commentDto);
         }
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
+        {
+            var comments = await _commentRepo.GetByIdAsync(id);
+
+            if(comments is null)
+            {
+                return NotFound();
+            }
+
+
+            return Ok(comments.ToCommentDto());
+        }
     }
 }

@@ -18,5 +18,12 @@ namespace dotnetDeneme.Repository
                 .Comments
                 .ToListAsync();
         }
+
+        public async Task<Comment?> GetByIdAsync(int id)
+        {
+            return await _context.Comments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

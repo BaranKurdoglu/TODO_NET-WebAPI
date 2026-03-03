@@ -41,14 +41,18 @@ namespace dotnetDeneme.Repository
         {
             return await _context.Stocks
                 .AsNoTracking()                    //Sorguyu database düzeyinde çalıştırarak bellekteki gereksiz veriyi önledik.
+                .Include(c =>c.Comments)       //Bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında, izlemeyi kapatmak için kullanırız.(AsNpTracking)
                 .Select(s => s.ToStockDto())     //EF Core'da databaseden çekilen her şey izlenir.
-                .ToListAsync();                //Bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında, izlemeyi kapatmak için kullanırız.(AsNpTracking)
+                .ToListAsync();                
         }
+
+        // EF Core’da önce entity query üzerinde Include ile ilişkili verileri ekletirsin, sonra Select ile DTO’ya dönüştürürsün. 
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
             return await _context.Stocks
-                .AsNoTracking() 
+                .AsNoTracking()
+                .Include(c =>c.Comments) 
                 .FirstOrDefaultAsync(x => x.Id == id); //Id'li işlemlerde FirstOrDefeult() kullan.
         }
 

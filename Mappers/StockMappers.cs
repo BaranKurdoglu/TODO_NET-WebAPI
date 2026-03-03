@@ -6,17 +6,18 @@ namespace dotnetDeneme.Mappers
     public static class StockMappers   // Veri dönüşüm katmanı.
     {
 
-        public static StockDto ToStockDto(this Stock stokModel)    //this -> Extension method 
+        public static StockDto ToStockDto(this Stock stockModel)    //this -> Extension method 
         {
             return new StockDto
             {
-                Id = stokModel.Id,
-                Symbol = stokModel.Symbol,
-                CompanyName = stokModel.CompanyName,
-                Purchase = stokModel.Purchase,
-                Industry = stokModel.Industry,
-                LastDiv = stokModel.LastDiv,
-                MarketCap = stokModel.MarketCap
+                Id = stockModel.Id,
+                Symbol = stockModel.Symbol,
+                CompanyName = stockModel.CompanyName,
+                Purchase = stockModel.Purchase,
+                Industry = stockModel.Industry,
+                LastDiv = stockModel.LastDiv,
+                MarketCap = stockModel.MarketCap,
+                Comments = stockModel.Comments.Select(c => c.ToCommentDto()).ToList()
             };
         }
 
