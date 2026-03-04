@@ -22,6 +22,9 @@ namespace dotnetDeneme.Controllers
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
         public async Task<IActionResult> GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stocks = await _stockRepo.GetAllAsync();
             var stockDto = stocks;
             return Ok(stocks);
@@ -31,6 +34,9 @@ namespace dotnetDeneme.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stocks = await _stockRepo.GetByIdAsync(id);
             if (stocks is null)
             {
@@ -44,6 +50,9 @@ namespace dotnetDeneme.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stockModel = stockDto.ToStockFromCreateDto();
             await _stockRepo.CreateAsync(stockModel);           // database'e giden herhangi bir şeye await eklemeliyiz.
 
@@ -55,6 +64,9 @@ namespace dotnetDeneme.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stockModel = await _stockRepo.UpdateAsync(id, updateDto);
 
             if (stockModel is null)
@@ -69,6 +81,9 @@ namespace dotnetDeneme.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stockModel = await _stockRepo.DeleteAsync(id);
 
             if (stockModel is null)

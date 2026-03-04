@@ -21,6 +21,9 @@ namespace dotnetDeneme.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comments = await _commentRepo.GetAllAsync();
 
             var commentDto = comments.Select(s => s.ToCommentDto());
@@ -32,6 +35,9 @@ namespace dotnetDeneme.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comments = await _commentRepo.GetByIdAsync(id);
 
             if (comments is null)
@@ -47,6 +53,9 @@ namespace dotnetDeneme.Controllers
         [HttpPost("{stockId}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var existingComment = await _stockRepo.StockExist(stockId);
             if (existingComment is false)
             {
@@ -63,6 +72,8 @@ namespace dotnetDeneme.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var comment = await _commentRepo.UpdateAsync(id, updateDto.ToCommentFromUpdate());
 
@@ -77,6 +88,9 @@ namespace dotnetDeneme.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comment = await _commentRepo.DeleteAsync(id);
 
             if (comment is null)
