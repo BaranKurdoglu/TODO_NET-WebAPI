@@ -76,8 +76,6 @@ namespace dotnetDeneme.Controllers
                 return NotFound();
             }
 
-
-
             return NoContent();
         }
 

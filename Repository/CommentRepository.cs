@@ -21,6 +21,20 @@ namespace dotnetDeneme.Repository
             return commentModel;
         }
 
+        public async Task<bool?> DeleteAsync(int id)
+        {
+            var existingComment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (existingComment is null)
+            {
+                return null;
+            }
+
+            _context.Comments.Remove(existingComment);
+            return await _context.SaveChangesAsync() is not 0; //Databse'de etkilenen satır sayısı 0 değilse true döndür.
+
+        }
+
         public async Task<List<Comment>> GetAllAsync()
         {
             return await _context
@@ -50,5 +64,7 @@ namespace dotnetDeneme.Repository
             await _context.SaveChangesAsync();
             return existingComment;
         }
+
+        
     }
 }

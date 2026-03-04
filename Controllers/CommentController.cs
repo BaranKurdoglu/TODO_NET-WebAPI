@@ -47,16 +47,18 @@ namespace dotnetDeneme.Controllers
         [HttpPost("{stockId}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
-            if (!await _stockRepo.StockExist(stockId))
+            var existingComment = await _stockRepo.StockExist(stockId);
+            if (existingComment is false)
             {
-                return BadRequest("Stock does not exist.");
+                return NotFound("Stock does not exist.");
             }
 
             var commentModel = commentDto.ToCommentFromCreate(stockId);
             await _commentRepo.CreateAsync(commentModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = commentModel }, commentModel.ToCommentDto());
+            return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto());
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
@@ -70,6 +72,19 @@ namespace dotnetDeneme.Controllers
             }
 
             return Ok(comment.ToCommentDto());
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var comment = await _commentRepo.DeleteAsync(id);
+
+            if (comment is null)
+            {
+                return NotFound("Comment could not be found.");
+            }
+
+            return NoContent();
         }
     }
 }
