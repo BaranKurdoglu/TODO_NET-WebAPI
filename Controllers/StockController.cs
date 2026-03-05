@@ -1,5 +1,6 @@
 ﻿using dotnetDeneme.Data;
 using dotnetDeneme.Dtos.Stock;
+using dotnetDeneme.Helpers;
 using dotnetDeneme.Interfaces;
 using dotnetDeneme.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,12 @@ namespace dotnetDeneme.Controllers
 
 
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
-        public async Task<IActionResult> GetAll() //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query) //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
             var stockDto = stocks;
             return Ok(stocks);
         }

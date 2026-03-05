@@ -1,5 +1,6 @@
 ﻿using dotnetDeneme.Data;
 using dotnetDeneme.Dtos.Stock;
+using dotnetDeneme.Helpers;
 using dotnetDeneme.Interfaces;
 using dotnetDeneme.Mappers;
 using dotnetDeneme.Models;
@@ -37,13 +38,27 @@ namespace dotnetDeneme.Repository
             return stockModel;
         }
 
-        public async Task<List<StockDto>> GetAllAsync()
+        public async Task<List<StockDto>> GetAllAsync(QueryObject query)
         {
-            return await _context.Stocks
+            var stocks = _context.Stocks
                 .AsNoTracking()                    //Sorguyu database düzeyinde çalıştırarak bellekteki gereksiz veriyi önledik.
-                .Include(c =>c.Comments)       //Bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında, izlemeyi kapatmak için kullanırız.(AsNpTracking)
-                .Select(s => s.ToStockDto())     //EF Core'da databaseden çekilen her şey izlenir.
-                .ToListAsync();                
+                .Include(c => c.Comments)       //Bu bilgiler üzerinde düzenleme-silme işlemleri yapıldığında, izlemeyi kapatmak için kullanırız.(AsNpTracking)
+                .AsQueryable();             //EF Core'da databaseden çekilen her şey izlenir.
+
+
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+
+            return await stocks.Select(s => s.ToStockDto()).ToListAsync(); // ToStockDto SQL’e çevrilemediği için önce filtreleyip sonra DTO’ya mapliyoruz.
         }
 
         // EF Core’da önce entity query üzerinde Include ile ilişkili verileri ekletirsin, sonra Select ile DTO’ya dönüştürürsün. 
@@ -52,7 +67,7 @@ namespace dotnetDeneme.Repository
         {
             return await _context.Stocks
                 .AsNoTracking()
-                .Include(c =>c.Comments) 
+                .Include(c => c.Comments)
                 .FirstOrDefaultAsync(x => x.Id == id); //Id'li işlemlerde FirstOrDefeult() kullan.
         }
 
