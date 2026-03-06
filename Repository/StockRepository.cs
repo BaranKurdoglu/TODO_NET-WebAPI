@@ -67,7 +67,15 @@ namespace dotnetDeneme.Repository
             }
 
 
-            return await stocks.Select(s => s.ToStockDto()).ToListAsync(); // ToStockDto SQL’e çevrilemediği için önce filtreleyip sonra DTO’ya mapliyoruz.
+
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+
+
+            return await stocks
+                .Skip(skipNumber) //Kaç kaydı atlayacağız.
+                .Take(query.PageSize) //Her sayfada kaç kayıt gösterilecek.
+                .Select(s => s.ToStockDto())
+                .ToListAsync(); // ToStockDto SQL’e çevrilemediği için önce filtreleyip sonra DTO’ya mapliyoruz.
         }
 
         // EF Core’da önce entity query üzerinde Include ile ilişkili verileri ekletirsin, sonra Select ile DTO’ya dönüştürürsün. 
