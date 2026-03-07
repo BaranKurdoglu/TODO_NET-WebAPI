@@ -114,4 +114,22 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+// Uygulama çalýþmadan hemen önce Seed iþlemini baþlatýyoruz
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // SeedData sýnýfýmýzdaki metodu çaðýrýyoruz
+        await SeedData.InitializeAsync(services);
+    }
+    catch (Exception ex)
+    {
+        // Gerekirse buraya logger ekleyerek seed iþlemi sýrasýndaki hatalarý yakalayabilirsiniz
+        Console.WriteLine($"Seed iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+    }
+}
+
+
 app.Run();

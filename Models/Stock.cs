@@ -23,5 +23,7 @@ namespace dotnetDeneme.Models
         public long MarketCap { get; set; }
 
         public List<Comment> Comments { get; set; } = new List<Comment>(); // 1 Stock'un birden fazla Comment'ı olabilir. 1 to Many ilişkisi.
+
+        public List<Portfolio> Portfolios { get; set; } = new List<Portfolio>(); // Many to Many (User-Stock)
     }
 }
