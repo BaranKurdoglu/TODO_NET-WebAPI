@@ -3,6 +3,7 @@ using dotnetDeneme.Dtos.Stock;
 using dotnetDeneme.Helpers;
 using dotnetDeneme.Interfaces;
 using dotnetDeneme.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ namespace dotnetDeneme.Controllers
 
 
         [HttpGet] // GET /dotnetDeneme/stock → GetAll()
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query) //IActionResult; bir Controller methodunun hangi HTTP response döndüreceğini söyler, 200-400-404 vs.
         {
             if (!ModelState.IsValid)
