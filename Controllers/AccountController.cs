@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dotnetDeneme.Controllers
 {
-    [Route("api/account")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -30,12 +30,12 @@ namespace dotnetDeneme.Controllers
                     Email = registerDto.Email
                 };
 
-
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+                // IdentityUser kütüphanesi Succeeded döndüğü için bir değişkene atamalıyız.
 
                 if (createdUser.Succeeded)
                 {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User"); // Her eklenen kullanıcıyı User rolüne tanımlar.
 
                     if (roleResult.Succeeded)
                     {
@@ -43,19 +43,19 @@ namespace dotnetDeneme.Controllers
                     }
                     else
                     {
-                        return StatusCode(500, roleResult.Errors);
+                        return BadRequest(roleResult.Errors);
                     }
                 }
 
                 else
                 {
-                    return StatusCode(500, createdUser.Errors);
+                    return BadRequest(createdUser.Errors);
                 }
             }
 
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return StatusCode(500, e);
+                return BadRequest(ex);
             }
         }
     }
