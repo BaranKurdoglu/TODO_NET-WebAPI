@@ -17,6 +17,11 @@ namespace dotnetDeneme.Repository
             _context = context;
         }
 
+        public async Task<Stock?> AddBySymbolAsync(string symbol)
+        {
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
+        }
+
         public async Task<Stock> CreateAsync(Stock stockModel)
         {
             await _context.Stocks.AddAsync(stockModel);

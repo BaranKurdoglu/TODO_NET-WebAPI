@@ -14,24 +14,65 @@ namespace dotnetDeneme.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IStockRepository _stockRepo;
-        private readonly IPortfoiloRepository _portfoiloRepo;
-        public PortfolioController(UserManager<AppUser> userManager, IStockRepository stockRepo,IPortfoiloRepository portfoiloRepo)
+        private readonly IPortfolioRepository _portfolioRepo;
+        public PortfolioController(UserManager<AppUser> userManager, IStockRepository stockRepo, IPortfolioRepository portfolioRepo)
         {
             _userManager = userManager;
             _stockRepo = stockRepo;
-            _portfoiloRepo = portfoiloRepo;
+            _portfolioRepo = portfolioRepo;
         }
+
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetUserPortfoilo()
+        public async Task<IActionResult> GetUserPortfolio()
         {
             var username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(username);
-            var userPortfoilo = await _portfoiloRepo.GetUserPortfoilo(appUser);
+            var userPortfolio = await _portfolioRepo.GetUserPortfolioAsync(appUser);
 
-            return Ok(userPortfoilo);
+            return Ok(userPortfolio);
         }
 
+
+
+        [HttpPost]
+        [Authorize]
+
+        public async Task<IActionResult> AddPortfolio(string symbol)
+        {
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+            var stock = await _stockRepo.AddBySymbolAsync(symbol);
+
+            if (stock is null)
+                return BadRequest("Stock not found.");
+
+
+            var userPortfolio = await _portfolioRepo.GetUserPortfolioAsync(appUser);
+
+            if (userPortfolio.Any(e => e.Symbol.ToLower() == symbol.ToLower()))
+                return BadRequest("Cannot add same stock to portfolio !");
+
+
+            var portfolioModel = new Portfolio
+            {
+                StockId = stock.Id,
+                AppUserId = appUser.Id
+            };
+
+            await _portfolioRepo.CreatePortfolioAsync(portfolioModel);
+
+
+            if (portfolioModel is null)
+                return BadRequest("Could not create.");
+
+            else
+            {
+                return Created();
+            }
+        }
     }
 }
+
+//UserManager; Microsoft.AspNetCore.Identity kütüphanesinden bir Class'tır.

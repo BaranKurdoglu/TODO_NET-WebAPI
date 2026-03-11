@@ -5,16 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dotnetDeneme.Repository
 {
-    public class PortfoiloRepository : IPortfoiloRepository
+    public class PortfolioRepository : IPortfolioRepository
     {
         private readonly ApplicationDBContext _context;
-        public PortfoiloRepository(ApplicationDBContext context)
+        public PortfolioRepository(ApplicationDBContext context)
         {
             _context = context;
         }
 
+        public async Task<Portfolio> CreatePortfolioAsync(Portfolio portfolio)
+        {
+            await _context.AddAsync(portfolio);
+            await _context.SaveChangesAsync();
+            return portfolio;
+        }
 
-        public async Task<List<Stock>> GetUserPortfoilo(AppUser user)
+        public async Task<List<Stock>> GetUserPortfolioAsync(AppUser user)
         {
             return await _context.Portfolios.Where(u => u.AppUserId == user.Id)
                 .Select(stock => new Stock
