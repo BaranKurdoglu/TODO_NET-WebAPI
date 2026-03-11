@@ -6,5 +6,6 @@ namespace dotnetDeneme.Interfaces
     {
         Task<List<Stock>> GetUserPortfolioAsync(AppUser user);
         Task<Portfolio> CreatePortfolioAsync(Portfolio portfolio);
+        Task<Portfolio> DeletePortfolioAsync(AppUser appUser, string symbol);
     }
 }
